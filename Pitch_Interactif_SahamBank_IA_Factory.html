@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Banking Factory — Pitch Siya Consulting × Saham Bank</title>
+<style>
+:root {
+  --navy:#191364; --violet:#593081; --green:#0A3F3B; --gold:#c9952b;
+  --navy-light:#cdd0ea; --violet-light:#d8ceea; --green-light:#c5e2dd;
+  --bg:#0d0b2e; --card:#1a1650; --border:rgba(255,255,255,0.1);
+  --white:#fff; --grey:#9ca3af;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--white)}
+
+/* ── PROGRESS BAR ── */
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--violet),var(--gold));transition:width .4s ease;z-index:100}
+
+/* ── NAV DOTS ── */
+#dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:100}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);cursor:pointer;transition:all .3s}
+.dot.active{background:var(--gold);transform:scale(1.4)}
+
+/* ── ARROWS ── */
+.arrow{position:fixed;z-index:100;background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--white);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(10px)}
+.arrow:hover{background:var(--violet);border-color:var(--violet)}
+#prev{left:20px;top:50%;transform:translateY(-50%)}
+#next{right:60px;top:50%;transform:translateY(-50%)}
+
+/* ── SLIDE COUNTER ── */
+#counter{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--grey);letter-spacing:2px;z-index:100}
+
+/* ── SLIDES ── */
+#slides{width:100%;height:100vh;position:relative}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 60px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow:hidden}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:all}
+.slide.out-left{opacity:0;transform:translateX(-60px)}
+
+/* ── BACKGROUND PATTERNS ── */
+.slide::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(89,48,129,0.15) 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(25,19,100,0.2) 0%,transparent 60%);pointer-events:none}
+
+/* ── SLIDE 0 — COVER ── */
+#s0{background:linear-gradient(135deg,#0d0b2e 0%,#191364 50%,#0d0b2e 100%)}
+.cover-logo{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.cover-logo-box{width:52px;height:52px;background:var(--white);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:var(--navy);letter-spacing:1px;line-height:1.2;text-align:center;padding:4px}
+.cover-badge{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+.cover-title{font-size:clamp(28px,4vw,52px);font-weight:800;text-align:center;line-height:1.15;margin-bottom:16px}
+.cover-title span{background:linear-gradient(90deg,var(--gold),#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:16px;color:rgba(255,255,255,0.55);text-align:center;margin-bottom:40px}
+.cover-pills{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.cpill{background:rgba(255,255,255,0.07);border:1px solid var(--border);padding:8px 18px;border-radius:30px;font-size:12px;color:rgba(255,255,255,0.7)}
+.cpill strong{color:var(--white)}
+.cover-cta{background:linear-gradient(90deg,var(--violet),var(--navy));border:none;color:var(--white);padding:14px 36px;border-radius:30px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 24px rgba(89,48,129,0.4)}
+.cover-cta:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(89,48,129,0.6)}
+
+/* ── SLIDE HEADER ── */
+.slide-header{text-align:center;margin-bottom:32px}
+.slide-eyebrow{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.slide-title{font-size:clamp(22px,3vw,36px);font-weight:800}
+.slide-title em{color:var(--gold);font-style:normal}
+
+/* ── SLIDE 1 — STATS ── */
+#s1{background:linear-gradient(160deg,#0d0b2e,#14113a)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;max-width:900px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px 20px;text-align:center;position:relative;overflow:hidden;transition:transform .3s}
+.stat-card:hover{transform:translateY(-4px)}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card:nth-child(1)::after,.stat-card:nth-child(2)::after{background:var(--navy)}
+.stat-card:nth-child(3)::after,.stat-card:nth-child(4)::after{background:var(--violet)}
+.stat-card:nth-child(5)::after,.stat-card:nth-child(6)::after{background:var(--green)}
+.stat-n{font-size:52px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--white),rgba(255,255,255,0.6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-unit{font-size:18px;font-weight:400}
+.stat-l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-top:8px}
+
+/* ── SLIDE 2 — CONTEXTE ── */
+#s2{background:linear-gradient(160deg,#0d0b2e,#14113a)}
+.ctx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;max-width:1100px}
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .3s}
+.ctx-card:hover{transform:translateY(-4px)}
+.ctx-head{padding:18px 20px;display:flex;align-items:center;gap:12px}
+.ctx-head.navy{background:linear-gradient(135deg,var(--navy),#2a1f8a)}
+.ctx-head.violet{background:linear-gradient(135deg,var(--violet),#7a3daa)}
+.ctx-head.green{background:linear-gradient(135deg,var(--green),#0d5a54)}
+.ctx-icon{font-size:24px}
+.ctx-name{font-size:14px;font-weight:700}
+.ctx-meta{font-size:10px;opacity:0.7;margin-top:2px}
+.ctx-body{padding:16px 20px}
+.ctx-body p{font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:12px}
+.ctx-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px}
+.tag.navy{background:rgba(25,19,100,0.4);color:#a8b0e8;border:1px solid rgba(25,19,100,0.5)}
+.tag.violet{background:rgba(89,48,129,0.4);color:#c4a8e8;border:1px solid rgba(89,48,129,0.5)}
+.tag.green{background:rgba(10,63,59,0.4);color:#a8d8d4;border:1px solid rgba(10,63,59,0.5)}
+.alert-strip{margin-top:20px;background:rgba(201,149,43,0.1);border:1px solid rgba(201,149,43,0.3);border-radius:8px;padding:12px 16px;font-size:11px;color:#f5c842;max-width:1100px;width:100%}
+
+/* ── SLIDE 3 — ORG ── */
+#s3{background:linear-gradient(160deg,#0d0b2e,#14113a)}
+.org-container{width:100%;max-width:1000px}
+.org-top-card{background:linear-gradient(135deg,var(--navy),#2a1f8a);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:16px 32px;text-align:center;margin-bottom:8px;position:relative}
+.org-top-card::after{content:'';position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:2px;height:20px;background:var(--border)}
+.org-top-title{font-size:15px;font-weight:700}
+.org-top-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px}
+.org-branches{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.org-branch{display:flex;flex-direction:column;align-items:center;position:relative}
+.org-branch::before{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:2px;height:20px;background:var(--border)}
+.pole-card{width:100%;border-radius:10px;padding:14px;text-align:center;margin-bottom:10px}
+.pole-card.navy{background:linear-gradient(135deg,var(--navy),#2a1f8a);border:1px solid rgba(168,176,232,0.2)}
+.pole-card.violet{background:linear-gradient(135deg,var(--violet),#7a3daa);border:1px solid rgba(196,168,232,0.2)}
+.pole-card.green{background:linear-gradient(135deg,var(--green),#0d5a54);border:1px solid rgba(168,216,212,0.2)}
+.pole-label{font-size:8px;letter-spacing:2px;opacity:0.6;text-transform:uppercase}
+.pole-name{font-size:14px;font-weight:800;margin:2px 0}
+.pole-meta{font-size:10px;opacity:0.65}
+.consultant-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.c-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:all .2s}
+.c-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.c-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;margin:0 auto 6px}
+.c-av.navy{background:var(--navy)}
+.c-av.violet{background:var(--violet)}
+.c-av.green{background:var(--green)}
+.c-name{font-size:10px;font-weight:700}
+.c-role{font-size:9px;color:var(--grey);margin-top:1px}
+.c-dispo{font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;display:inline-block;margin-top:4px}
+.d-now{background:rgba(5,150,105,0.2);color:#34d399;border:1px solid rgba(5,150,105,0.3)}
+.d-1m{background:rgba(217,119,6,0.2);color:#fbbf24;border:1px solid rgba(217,119,6,0.3)}
+.d-2m{background:rgba(220,38,38,0.2);color:#f87171;border:1px solid rgba(220,38,38,0.3)}
+.c-tjm{font-size:9px;color:var(--grey);margin-top:4px}
+
+/* ── SLIDE 4 — PROFILS ── */
+#s4{background:linear-gradient(160deg,#0d0b2e,#14113a);padding:30px 50px}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:rgba(255,255,255,0.05);border-radius:8px;padding:4px}
+.tab{flex:1;padding:10px;text-align:center;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s;color:var(--grey)}
+.tab.active{color:var(--white)}
+.tab.active.navy{background:var(--navy)}
+.tab.active.violet{background:var(--violet)}
+.tab.active.green{background:var(--green)}
+.tab-content{display:none;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:1000px}
+.tab-content.active{display:grid}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.pcard-head{padding:16px 18px;display:flex;align-items:center;gap:12px}
+.pcard-head.navy{background:linear-gradient(135deg,var(--navy),#2a1f8a)}
+.pcard-head.violet{background:linear-gradient(135deg,var(--violet),#7a3daa)}
+.pcard-head.green{background:linear-gradient(135deg,var(--green),#0d5a54)}
+.pav{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.pname{font-size:14px;font-weight:700}
+.prole{font-size:10px;opacity:0.7;margin-top:2px}
+.prows{padding:12px 16px 0}
+.prow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.prow:last-child{border-bottom:none}
+.plbl{color:var(--gold)}
+.val-ok{color:#34d399;font-weight:700}
+.val-warn{color:#fbbf24;font-weight:700}
+.val-bad{color:#f87171;font-weight:700}
+.pskills{padding:10px 16px;border-top:1px solid var(--border)}
+.pskill-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+.pskill-wrap{display:flex;flex-wrap:wrap;gap:4px}
+.sk{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px}
+.sk.navy{background:rgba(25,19,100,0.4);color:#a8b0e8}
+.sk.violet{background:rgba(89,48,129,0.4);color:#c4a8e8}
+.sk.green{background:rgba(10,63,59,0.4);color:#a8d8d4}
+.pcov{padding:10px 16px 14px;border-top:1px solid var(--border)}
+.cov-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;color:var(--grey)}
+.cov-dot{width:6px;height:6px;border-radius:50%}
+.cov-dot.full{background:#34d399}
+.cov-dot.part{background:#fbbf24}
+
+/* ── SLIDE 5 — MATRICE ── */
+#s5{background:linear-gradient(160deg,#0d0b2e,#14113a);padding:30px 40px}
+.matrix-wrap{width:100%;max-width:1100px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{padding:10px 8px;text-align:center;font-size:9px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+th.col-label{text-align:left;background:rgba(255,255,255,0.05);color:var(--grey)}
+th.col-req{text-align:left;background:rgba(255,255,255,0.03);color:var(--grey)}
+th.navy-h{background:rgba(25,19,100,0.6);color:#a8b0e8}
+th.violet-h{background:rgba(89,48,129,0.6);color:#c4a8e8}
+th.green-h{background:rgba(10,63,59,0.6);color:#a8d8d4}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:rgba(89,48,129,0.1)}
+td{padding:9px 8px;vertical-align:middle}
+td.td-d{font-weight:700;color:rgba(255,255,255,0.85);font-size:11px}
+td.td-r{color:var(--grey);font-size:10px}
+td.td-c{text-align:center;font-size:16px}
+.ck-full{color:#34d399}
+.ck-part{color:#fbbf24;font-size:13px}
+.ck-none{color:rgba(255,255,255,0.15);font-size:13px}
+
+/* ── SLIDE 6 — GANTT ── */
+#s6{background:linear-gradient(160deg,#0d0b2e,#14113a);padding:24px 40px;justify-content:flex-start;overflow-y:auto}
+.gantt-wrap{width:100%;max-width:1100px}
+.g-months-row{display:grid;grid-template-columns:140px repeat(6,1fr);background:var(--navy);border-radius:8px 8px 0 0;margin-bottom:0}
+.g-mc{padding:8px 10px;font-size:9px;color:rgba(255,255,255,0.4)}
+.g-month{padding:8px 4px;text-align:center;font-size:10px;font-weight:700;color:rgba(255,255,255,0.8);border-left:1px solid rgba(255,255,255,0.1)}
+.g-phases-row{display:grid;grid-template-columns:140px repeat(3,2fr);background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border)}
+.g-phase-lbl{padding:5px 10px;font-size:8px;color:var(--grey)}
+.g-phase{padding:5px 4px;text-align:center;font-size:9px;font-weight:700;border-left:1px solid var(--border)}
+.g-phase.p1{color:#a8b0e8}
+.g-phase.p2{color:#c4a8e8}
+.g-phase.p3{color:#a8d8d4}
+.g-body{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px}
+.g-row{display:grid;grid-template-columns:140px repeat(12,1fr);border-bottom:1px solid var(--border);min-height:38px}
+.g-row:last-child{border-bottom:none}
+.g-row:nth-child(even){background:rgba(255,255,255,0.02)}
+.g-label-cell{padding:6px 10px;border-right:2px solid var(--navy);display:flex;flex-direction:column;justify-content:center}
+.gn{font-size:10px;font-weight:700;color:var(--white)}
+.gr{font-size:8.5px;color:var(--grey)}
+.g-cell{border-right:1px solid var(--border);padding:3px;display:flex;align-items:center}
+.g-cell:last-child{border-right:none}
+.gbar{height:18px;border-radius:3px;width:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;white-space:nowrap;overflow:hidden;padding:0 4px;transition:width 1s ease;border-left:3px solid transparent}
+.gbar.navy{background:rgba(25,19,100,0.5);border-left-color:var(--navy);color:#a8b0e8}
+.gbar.violet{background:rgba(89,48,129,0.5);border-left-color:var(--violet);color:#c4a8e8}
+.gbar.green{background:rgba(10,63,59,0.5);border-left-color:var(--green);color:#a8d8d4}
+.gbar.wait{background:rgba(255,255,255,0.05);border:1px dashed var(--border);border-left:none;color:var(--grey);font-size:8px}
+.gbar.renew{background:rgba(201,149,43,0.15);border-left-color:var(--gold);color:#f5c842;font-style:italic}
+.gbar.full{width:100%}
+.g-ms-row{display:grid;grid-template-columns:140px repeat(12,1fr);background:rgba(25,19,100,0.4);border-radius:0 0 8px 8px;margin-top:1px}
+.g-ms-lbl{padding:4px 10px;font-size:8px;color:rgba(255,255,255,0.4)}
+.g-ms-cell{border-right:1px solid rgba(255,255,255,0.05);padding:2px}
+.g-marker{background:var(--gold);color:var(--bg);font-size:8px;font-weight:800;padding:2px 4px;border-radius:3px;text-align:center;white-space:nowrap}
+.gantt-legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.gl{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--grey)}
+.gl-dot{width:12px;height:6px;border-radius:2px}
+.gl-dot.navy{background:rgba(25,19,100,0.8);border-left:3px solid var(--navy)}
+.gl-dot.violet{background:rgba(89,48,129,0.8);border-left:3px solid var(--violet)}
+.gl-dot.green{background:rgba(10,63,59,0.8);border-left:3px solid var(--green)}
+.gl-dot.renew{background:rgba(201,149,43,0.3);border-left:3px solid var(--gold)}
+.gl-dot.wait{background:rgba(255,255,255,0.05);border:1px dashed var(--border)}
+
+/* ── SLIDE 7 — CTA ── */
+#s7{background:linear-gradient(135deg,#0d0b2e,#191364,#0d0b2e)}
+.cta-inner{text-align:center;max-width:700px}
+.cta-check{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--navy));display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 24px;box-shadow:0 0 40px rgba(89,48,129,0.5)}
+.cta-title{font-size:clamp(24px,3.5vw,42px);font-weight:800;margin-bottom:12px}
+.cta-sub{font-size:16px;color:rgba(255,255,255,0.6);margin-bottom:36px;line-height:1.6}
+.cta-cards{display:flex;gap:16px;justify-content:center;margin-bottom:40px}
+.cta-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;text-align:center;min-width:160px}
+.cta-card-icon{font-size:24px;margin-bottom:8px}
+.cta-card-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:4px}
+.cta-card-value{font-size:14px;font-weight:700}
+.cta-contact{background:linear-gradient(90deg,var(--violet),var(--navy));padding:16px 40px;border-radius:30px;font-size:14px;font-weight:700;border:none;color:var(--white);cursor:default;display:inline-block}
+.cta-note{margin-top:16px;font-size:11px;color:rgba(255,255,255,0.3)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .stat-card,.slide.active .ctx-card,.slide.active .c-card,.slide.active .pcard,.slide.active .cta-card{animation:fadeUp .5s ease both}
+.slide.active .stat-card:nth-child(1){animation-delay:.05s}
+.slide.active .stat-card:nth-child(2){animation-delay:.1s}
+.slide.active .stat-card:nth-child(3){animation-delay:.15s}
+.slide.active .stat-card:nth-child(4){animation-delay:.2s}
+.slide.active .stat-card:nth-child(5){animation-delay:.25s}
+.slide.active .stat-card:nth-child(6){animation-delay:.3s}
+.slide.active .ctx-card:nth-child(1){animation-delay:.05s}
+.slide.active .ctx-card:nth-child(2){animation-delay:.15s}
+.slide.active .ctx-card:nth-child(3){animation-delay:.25s}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="dots"></div>
+<button class="arrow" id="prev">&#8592;</button>
+<button class="arrow" id="next">&#8594;</button>
+<div id="counter"></div>
+
+<div id="slides">
+
+<!-- ══ SLIDE 0 — COVER ══ -->
+<div class="slide active" id="s0">
+  <div class="cover-logo">
+    <div class="cover-logo-box">SIYA<br>CSG</div>
+    <span class="cover-badge">Siya Consulting</span>
+  </div>
+  <div class="cover-title">AI Banking Factory<br><span>Saham Bank × Siya Consulting</span></div>
+  <div class="cover-sub">Réponse à Appel d'Offres — Architecture d'équipe & Feuille de route 6 mois</div>
+  <div class="cover-pills">
+    <div class="cpill"><strong>Client :</strong> Saham Bank — DIFA / IA Factory</div>
+    <div class="cpill"><strong>Date :</strong> 24 Avril 2026</div>
+    <div class="cpill"><strong>Durée :</strong> 6 mois (3M renouvelable)</div>
+    <div class="cpill"><strong>Méthode :</strong> Agile · Sprints 2 semaines</div>
+  </div>
+  <button class="cover-cta" onclick="goTo(1)">Découvrir le dispositif &#8594;</button>
+</div>
+
+<!-- ══ SLIDE 1 — STATS ══ -->
+<div class="slide" id="s1">
+  <div class="slide-header">
+    <div class="slide-eyebrow">Chiffres clés</div>
+    <div class="slide-title">Un dispositif <em>complet & opérationnel</em></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-n"><span class="count" data-target="6">0</span></div><div class="stat-l">Consultants experts</div></div>
+    <div class="stat-card"><div class="stat-n"><span class="count" data-target="3">0</span></div><div class="stat-l">Pôles d'expertise</div></div>
+    <div class="stat-card"><div class="stat-n"><span class="count" data-target="3">0</span></div><div class="stat-l">CDC Saham Bank couverts</div></div>
+    <div class="stat-card"><div class="stat-n"><span class="count" data-target="12">0</span></div><div class="stat-l">Sprints Agiles</div></div>
+    <div class="stat-card"><div class="stat-n"><span class="count" data-target="6">0</span><span class="stat-unit"> mois</span></div><div class="stat-l">Feuille de route</div></div>
+    <div class="stat-card"><div class="stat-n"><span class="count" data-target="2">0</span></div><div class="stat-l">Profils qualifiés / poste</div></div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 2 — CONTEXTE ══ -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <div class="slide-eyebrow">Analyse des besoins</div>
+    <div class="slide-title">3 CDC <em>Saham Bank</em> — couverture complète</div>
+  </div>
+  <div class="ctx-grid">
+    <div class="ctx-card">
+      <div class="ctx-head navy"><span class="ctx-icon">🏗</span><div><div class="ctx-name">Architecte IA Senior</div><div class="ctx-meta">1 ressource · IA Factory · 6+ ans</div></div></div>
+      <div class="ctx-body"><p>Définir et piloter l'architecture cible IA (LLM, orchestration, sécurité, MLOps). Architecture hybride Cloud/On-prem, Zero Trust, RAG, intégration CBS.</p>
+      <div class="ctx-tags"><span class="tag navy">LangGraph/MCP</span><span class="tag navy">Zero Trust</span><span class="tag navy">RAG Design</span><span class="tag navy">CBS Integ.</span><span class="tag navy">Kafka/MQ</span></div></div>
+    </div>
+    <div class="ctx-card">
+      <div class="ctx-head violet"><span class="ctx-icon">⚙</span><div><div class="ctx-name">LLMOps Engineer</div><div class="ctx-meta">1 ressource · DIFA · 5+ ans</div></div></div>
+      <div class="ctx-body"><p>Industrialiser la chaîne CI/CD, monitoring, observabilité conversationnelle, sécurité PII et gouvernance des agents IA en production.</p>
+      <div class="ctx-tags"><span class="tag violet">CI/CD ArgoCD</span><span class="tag violet">MLflow Registry</span><span class="tag violet">LangSmith</span><span class="tag violet">Kubernetes/GPU</span><span class="tag violet">PII Scrubbing</span></div></div>
+    </div>
+    <div class="ctx-card">
+      <div class="ctx-head green"><span class="ctx-icon">💻</span><div><div class="ctx-name">IA Engineers Senior</div><div class="ctx-meta">3 ressources · IA Factory · 4–7 ans</div></div></div>
+      <div class="ctx-body"><p>Développer pipelines RAG, workflows agentiques multi-tours (UC-01 Siham, UC-03 Crédit PME) et APIs IA intégrées au SI bancaire.</p>
+      <div class="ctx-tags"><span class="tag green">LangGraph stateful</span><span class="tag green">RAG Hybrid</span><span class="tag green">RAGAS/DeepEval</span><span class="tag green">Python avancé</span><span class="tag green">Vector DB</span></div></div>
+    </div>
+  </div>
+  <div class="alert-strip">⚡ <strong>Note :</strong> Le CDC IA Engineers prévoit 3 ressources. Siya propose 2 profils qualifiés à ce stade — le 3ème slot peut être activé sur confirmation client sous 2 semaines. Montée en charge progressive dès le Sprint 1.</div>
+</div>
+
+<!-- ══ SLIDE 3 — ORG ══ -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <div class="slide-eyebrow">Architecture de l'équipe</div>
+    <div class="slide-title"><em>3 pôles</em> complémentaires · 6 experts</div>
+  </div>
+  <div class="org-container">
+    <div class="org-top-card">
+      <div class="org-top-title">🏦 Saham Bank — Comité de Pilotage IA Factory</div>
+      <div class="org-top-sub">Direction Digitale & Innovation · DIFA</div>
+    </div>
+    <div class="org-branches">
+      <div class="org-branch">
+        <div class="pole-card navy"><div class="pole-label">Pôle</div><div class="pole-name">Architecture IA</div><div class="pole-meta">2 consultants · 15 ans d'exp.</div></div>
+        <div class="consultant-cards">
+          <div class="c-card"><div class="c-av navy">OB</div><div class="c-name">Oussama Bennis</div><div class="c-role">Architecte IA Lead</div><div class="c-dispo d-now">● Immédiat</div><div class="c-tjm">5 500 MAD/j</div></div>
+          <div class="c-card"><div class="c-av navy">MYL</div><div class="c-name">M. Y. Lafrimi</div><div class="c-role">Architecte IA</div><div class="c-dispo d-1m">● 1 mois</div><div class="c-tjm">4 300 MAD/j</div></div>
+        </div>
+      </div>
+      <div class="org-branch">
+        <div class="pole-card violet"><div class="pole-label">Pôle</div><div class="pole-name">LLMOps</div><div class="pole-meta">2 consultants · 4–5 ans d'exp.</div></div>
+        <div class="consultant-cards">
+          <div class="c-card"><div class="c-av violet">EA</div><div class="c-name">ElMahdi Aymani</div><div class="c-role">LLMOps Lead</div><div class="c-dispo d-now">● Immédiat</div><div class="c-tjm">4 500 MAD/j</div></div>
+          <div class="c-card"><div class="c-av violet">MA</div><div class="c-name">Mohamed Azhari</div><div class="c-role">LLMOps Engineer</div><div class="c-dispo d-2m">● 2 mois</div><div class="c-tjm">4 300 MAD/j</div></div>
+        </div>
+      </div>
+      <div class="org-branch">
+        <div class="pole-card green"><div class="pole-label">Pôle</div><div class="pole-name">IA Engineering</div><div class="pole-meta">2 consultants · 4–6 ans d'exp.</div></div>
+        <div class="consultant-cards">
+          <div class="c-card"><div class="c-av green">MYI</div><div class="c-name">Med Y. Ibach</div><div class="c-role">IA Engineer Sr.</div><div class="c-dispo d-1m">● 1 mois</div><div class="c-tjm">4 800 MAD/j</div></div>
+          <div class="c-card"><div class="c-av green">OO</div><div class="c-name">Omar Ouahid</div><div class="c-role">IA Engineer Sr.</div><div class="c-dispo d-2m">● 2 mois</div><div class="c-tjm">4 300 MAD/j</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 4 — PROFILS ══ -->
+<div class="slide" id="s4">
+  <div class="slide-header" style="margin-bottom:16px">
+    <div class="slide-eyebrow">Profils consultants</div>
+    <div class="slide-title">6 experts qualifiés · <em>2 par poste</em></div>
+  </div>
+  <div class="tabs" style="max-width:1000px;width:100%">
+    <div class="tab active navy" onclick="switchTab('archi',this,'navy')">🏗 Architecture IA</div>
+    <div class="tab violet" onclick="switchTab('llmops',this,'violet')">⚙ LLMOps</div>
+    <div class="tab green" onclick="switchTab('eng',this,'green')">💻 IA Engineering</div>
+  </div>
+  <!-- Architecture -->
+  <div class="tab-content active" id="tab-archi">
+    <div class="pcard">
+      <div class="pcard-head navy"><div class="pav">OB</div><div><div class="pname">Oussama Bennis</div><div class="prole">Architecte IA Lead · 15 ans</div></div></div>
+      <div class="prows">
+        <div class="prow"><span class="plbl">Disponibilité</span><span class="val-ok">Immédiate</span></div>
+        <div class="prow"><span class="plbl">TJM</span><span>5 500 MAD</span></div>
+        <div class="prow"><span class="plbl">Accord candidat</span><span class="val-warn">En cours</span></div>
+      </div>
+      <div class="pskills"><div class="pskill-lbl">Compétences clés</div><div class="pskill-wrap"><span class="sk navy">Architecture LLM</span><span class="sk navy">Zero Trust</span><span class="sk navy">RAG Design</span><span class="sk navy">LangGraph</span><span class="sk navy">MAS Patterns</span></div></div>
+      <div class="pcov">
+        <div class="pskill-lbl">Couverture CDC</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Stratégie LLM & souveraineté</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Architecture intégration CBS</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Sécurité & Gouvernance Zero Trust</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Architecture RAG & embeddings</div>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pcard-head navy"><div class="pav">MYL</div><div><div class="pname">Mosaab Y. Lafrimi</div><div class="prole">Architecte IA · 15 ans</div></div></div>
+      <div class="prows">
+        <div class="prow"><span class="plbl">Disponibilité</span><span class="val-warn">1 mois</span></div>
+        <div class="prow"><span class="plbl">TJM</span><span>4 300 MAD</span></div>
+        <div class="prow"><span class="plbl">Accord candidat</span><span class="val-ok">Signé ✓</span></div>
+      </div>
+      <div class="pskills"><div class="pskill-lbl">Compétences clés</div><div class="pskill-wrap"><span class="sk navy">Architecture Cloud</span><span class="sk navy">API Security</span><span class="sk navy">HITL Design</span><span class="sk navy">Kafka/MQ</span><span class="sk navy">MRM</span></div></div>
+      <div class="pcov">
+        <div class="pskill-lbl">Couverture CDC</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Architecture cloud hybride</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Design Human in the Loop</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Architecture événementielle Kafka</div>
+        <div class="cov-row"><span class="cov-dot part"></span>Standards Multi-Agent (MAS)</div>
+      </div>
+    </div>
+  </div>
+  <!-- LLMOps -->
+  <div class="tab-content" id="tab-llmops">
+    <div class="pcard">
+      <div class="pcard-head violet"><div class="pav">EA</div><div><div class="pname">ElMahdi Aymani</div><div class="prole">LLMOps Lead · 5 ans</div></div></div>
+      <div class="prows">
+        <div class="prow"><span class="plbl">Disponibilité</span><span class="val-ok">Immédiate (OPC)</span></div>
+        <div class="prow"><span class="plbl">TJM</span><span>4 500 MAD</span></div>
+        <div class="prow"><span class="plbl">Accord candidat</span><span class="val-ok">Signé ✓</span></div>
+      </div>
+      <div class="pskills"><div class="pskill-lbl">Compétences clés</div><div class="pskill-wrap"><span class="sk violet">CI/CD ArgoCD</span><span class="sk violet">Kubernetes</span><span class="sk violet">MLflow</span><span class="sk violet">LangSmith</span><span class="sk violet">Prometheus</span></div></div>
+      <div class="pcov">
+        <div class="pskill-lbl">Couverture CDC</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Industrialisation & CI/CD pipelines</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Observabilité conversationnelle</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Model Registry (MLflow)</div>
+        <div class="cov-row"><span class="cov-dot part"></span>Test A/B & expérimentation agents</div>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pcard-head violet"><div class="pav">MA</div><div><div class="pname">Mohamed Azhari</div><div class="prole">LLMOps Engineer · 4 ans</div></div></div>
+      <div class="prows">
+        <div class="prow"><span class="plbl">Disponibilité</span><span class="val-bad">2 mois (Leyton)</span></div>
+        <div class="prow"><span class="plbl">TJM</span><span>4 300 MAD</span></div>
+        <div class="prow"><span class="plbl">Accord candidat</span><span class="val-ok">Signé ✓</span></div>
+      </div>
+      <div class="pskills"><div class="pskill-lbl">Compétences clés</div><div class="pskill-wrap"><span class="sk violet">DevOps/SRE</span><span class="sk violet">GPU Mgmt</span><span class="sk violet">PII Scrubbing</span><span class="sk violet">Arize/Helicone</span><span class="sk violet">Kill Switch</span></div></div>
+      <div class="pcov">
+        <div class="pskill-lbl">Couverture CDC</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Sécurité PII & scrubbing pipelines</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Gouvernance agents & cycle de vie</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Gestion infrastructure GPU</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Réponse incidents & kill switch</div>
+      </div>
+    </div>
+  </div>
+  <!-- IA Engineering -->
+  <div class="tab-content" id="tab-eng">
+    <div class="pcard">
+      <div class="pcard-head green"><div class="pav">MYI</div><div><div class="pname">Med Yassine Ibach</div><div class="prole">IA Engineer Senior · 6 ans</div></div></div>
+      <div class="prows">
+        <div class="prow"><span class="plbl">Disponibilité</span><span class="val-warn">1 mois (CIH)</span></div>
+        <div class="prow"><span class="plbl">TJM</span><span>4 800 MAD</span></div>
+        <div class="prow"><span class="plbl">Accord candidat</span><span class="val-ok">Signé ✓</span></div>
+      </div>
+      <div class="pskills"><div class="pskill-lbl">Compétences clés</div><div class="pskill-wrap"><span class="sk green">Python avancé</span><span class="sk green">LangGraph</span><span class="sk green">RAG Hybrid</span><span class="sk green">RAGAS/DeepEval</span><span class="sk green">MCP Protocol</span></div></div>
+      <div class="pcov">
+        <div class="pskill-lbl">Couverture CDC</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Dev agentique stateful LangGraph</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Optimisation RAG (hybrid, re-ranking)</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Evaluation & qualité (RAGAS)</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Intégration CBS via MCP</div>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="pcard-head green"><div class="pav">OO</div><div><div class="pname">Omar Ouahid</div><div class="prole">IA Engineer Senior · 4 ans</div></div></div>
+      <div class="prows">
+        <div class="prow"><span class="plbl">Disponibilité</span><span class="val-bad">2 mois (DXC)</span></div>
+        <div class="prow"><span class="plbl">TJM</span><span>4 300 MAD</span></div>
+        <div class="prow"><span class="plbl">Accord candidat</span><span class="val-warn">En cours</span></div>
+      </div>
+      <div class="pskills"><div class="pskill-lbl">Compétences clés</div><div class="pskill-wrap"><span class="sk green">LangChain</span><span class="sk green">Milvus/Qdrant</span><span class="sk green">Prompt Security</span><span class="sk green">Docker/K8s</span><span class="sk green">API Auth</span></div></div>
+      <div class="pcov">
+        <div class="pskill-lbl">Couverture CDC</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Gouvernance & sécurité des prompts</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Bases de données vectorielles</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Optimisation perf/coût tokens</div>
+        <div class="cov-row"><span class="cov-dot full"></span>Déploiement Docker/K8s CI/CD</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 5 — MATRICE ══ -->
+<div class="slide" id="s5">
+  <div class="slide-header" style="margin-bottom:16px">
+    <div class="slide-eyebrow">Matrice des capacités</div>
+    <div class="slide-title">Croisement <em>CDC × Expertise</em></div>
+  </div>
+  <div class="matrix-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-label" style="text-align:left;width:110px">Domaine</th>
+          <th class="col-req" style="text-align:left;width:170px">Exigence CDC</th>
+          <th class="navy-h">O.Bennis</th><th class="navy-h">M.Lafrimi</th>
+          <th class="violet-h">E.Aymani</th><th class="violet-h">M.Azhari</th>
+          <th class="green-h">MY.Ibach</th><th class="green-h">O.Ouahid</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-d">Architecture LLM</td><td class="td-r">Stratégie hybride Cloud/On-prem</td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-none">–</span></td></tr>
+        <tr><td class="td-d">Intégration CBS</td><td class="td-r">Connecteurs MCP, API bancaires</td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td></tr>
+        <tr><td class="td-d">Orchestration agentique</td><td class="td-r">LangGraph, MCP, state management</td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td></tr>
+        <tr><td class="td-d">CI/CD & MLOps</td><td class="td-r">GitLab, ArgoCD, Model Registry</td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td></tr>
+        <tr><td class="td-d">Observabilité LLM</td><td class="td-r">LangSmith, Arize, Prometheus</td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td></tr>
+        <tr><td class="td-d">Sécurité Zero Trust</td><td class="td-r">PII, secrets, guardrails</td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-full">✓</span></td></tr>
+        <tr><td class="td-d">RAG & Vector DB</td><td class="td-r">Hybrid search, re-ranking</td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td></tr>
+        <tr><td class="td-d">Évaluation LLM</td><td class="td-r">RAGAS, DeepEval, tests régression</td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td></tr>
+        <tr><td class="td-d">Kubernetes / GPU</td><td class="td-r">Orchestration, scaling, GPU infra</td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td></tr>
+        <tr><td class="td-d">Gouvernance IA</td><td class="td-r">MRM, cycle vie agents, promotion</td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-full">✓</span></td><td class="td-c"><span class="ck-part">~</span></td><td class="td-c"><span class="ck-none">–</span></td><td class="td-c"><span class="ck-none">–</span></td></tr>
+      </tbody>
+    </table>
+    <div style="display:flex;gap:20px;margin-top:12px;font-size:11px;color:var(--grey)">
+      <span><span class="ck-full">✓</span> Couverture complète</span>
+      <span><span class="ck-part">~</span> Couverture partielle</span>
+      <span><span class="ck-none">–</span> Non couvert</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 6 — GANTT ══ -->
+<div class="slide" id="s6">
+  <div class="slide-header" style="margin-bottom:16px">
+    <div class="slide-eyebrow">Feuille de route</div>
+    <div class="slide-title">6 mois · <em>12 sprints</em> · 3 phases</div>
+  </div>
+  <div class="gantt-wrap">
+    <div class="g-months-row">
+      <div class="g-mc">Consultant</div>
+      <div class="g-month">Mai 2026</div><div class="g-month">Juin</div>
+      <div class="g-month">Juillet</div><div class="g-month">Août</div>
+      <div class="g-month">Sept.</div><div class="g-month">Oct. 2026</div>
+    </div>
+    <div class="g-phases-row">
+      <div class="g-phase-lbl">Phase</div>
+      <div class="g-phase p1" style="grid-column:span 2">Phase 1 — Fondations (M1–M2)</div>
+      <div class="g-phase p2" style="grid-column:span 2">Phase 2 — Construction (M3–M4)</div>
+      <div class="g-phase p3" style="grid-column:span 2">Phase 3 — Industrialisation (M5–M6)</div>
+    </div>
+    <div class="g-body">
+      <!-- O.Bennis -->
+      <div class="g-row">
+        <div class="g-label-cell"><span class="gn">O. Bennis</span><span class="gr">Architecte IA Lead</span></div>
+        <div class="g-cell"><div class="gbar navy animated">Archi LLM</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Standards RAG</div></div>
+        <div class="g-cell"><div class="gbar navy animated">CBS Zero Trust</div></div>
+        <div class="g-cell"><div class="gbar navy animated">HITL · Sécu</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Review UC</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Scale archi</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Gouvernance</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Audit BAM</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Multi-UC</div></div>
+        <div class="g-cell"><div class="gbar navy animated">KT équipe</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Renouv.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ M+3</div></div>
+      </div>
+      <!-- M.Lafrimi -->
+      <div class="g-row">
+        <div class="g-label-cell"><span class="gn">M. Lafrimi</span><span class="gr">Architecte IA</span></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Préavis</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Onboard</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Kafka · événement.</div></div>
+        <div class="g-cell"><div class="gbar navy animated">MRM · Guardrails</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Sécu APIs</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Doc technique</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Review UC-01/03</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Résilience</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Audit BAM</div></div>
+        <div class="g-cell"><div class="gbar navy animated">Dossier final</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Renouv.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Support</div></div>
+      </div>
+      <!-- E.Aymani -->
+      <div class="g-row">
+        <div class="g-label-cell"><span class="gn">E. Aymani</span><span class="gr">LLMOps Lead</span></div>
+        <div class="g-cell"><div class="gbar violet animated">CI/CD · MLflow</div></div>
+        <div class="g-cell"><div class="gbar violet animated">LangSmith · Prom.</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Coûts tokens</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Pipeline CI/CD</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Test A/B</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Kill switch</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Rate limiting</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Optim. infra</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Monitoring prod</div></div>
+        <div class="g-cell"><div class="gbar violet animated">SLAs · alerting</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Renouv.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Scale UC</div></div>
+      </div>
+      <!-- M.Azhari -->
+      <div class="g-row">
+        <div class="g-label-cell"><span class="gn">M. Azhari</span><span class="gr">LLMOps Engineer</span></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Préavis</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Préavis</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Onboard</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Onboard</div></div>
+        <div class="g-cell"><div class="gbar violet animated">PII · GPU</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Secrets · On-prem</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Network policies</div></div>
+        <div class="g-cell"><div class="gbar violet animated">GPU mgmt</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Dynamic routing</div></div>
+        <div class="g-cell"><div class="gbar violet animated">Doc exploit.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Renouv.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Nouveaux UC</div></div>
+      </div>
+      <!-- MY.Ibach -->
+      <div class="g-row">
+        <div class="g-label-cell"><span class="gn">MY. Ibach</span><span class="gr">IA Engineer Senior</span></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Préavis</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Onboard</div></div>
+        <div class="g-cell"><div class="gbar green animated">UC-01 Siham</div></div>
+        <div class="g-cell"><div class="gbar green animated">RAG Hybrid</div></div>
+        <div class="g-cell"><div class="gbar green animated">UC-03 Crédit PME</div></div>
+        <div class="g-cell"><div class="gbar green animated">Optim. tokens</div></div>
+        <div class="g-cell"><div class="gbar green animated">Tests régression</div></div>
+        <div class="g-cell"><div class="gbar green animated">Fine-tuning LLM</div></div>
+        <div class="g-cell"><div class="gbar green animated">Extension UC-05</div></div>
+        <div class="g-cell"><div class="gbar green animated">Prompt eng.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Renouv.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Nouveaux UC</div></div>
+      </div>
+      <!-- O.Ouahid -->
+      <div class="g-row">
+        <div class="g-label-cell"><span class="gn">O. Ouahid</span><span class="gr">IA Engineer Senior</span></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Préavis</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Préavis</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Onboard</div></div>
+        <div class="g-cell"><div class="gbar wait animated">⏳ Onboard</div></div>
+        <div class="g-cell"><div class="gbar green animated">Prompt security</div></div>
+        <div class="g-cell"><div class="gbar green animated">Vector DB</div></div>
+        <div class="g-cell"><div class="gbar green animated">Connecteurs CBS</div></div>
+        <div class="g-cell"><div class="gbar green animated">DeepEval</div></div>
+        <div class="g-cell"><div class="gbar green animated">RAG avancé</div></div>
+        <div class="g-cell"><div class="gbar green animated">User guide</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Renouv.</div></div>
+        <div class="g-cell"><div class="gbar renew animated">↻ Scale UC</div></div>
+      </div>
+    </div>
+    <!-- Jalons -->
+    <div class="g-ms-row">
+      <div class="g-ms-lbl">Jalons</div>
+      <div class="g-ms-cell"></div>
+      <div class="g-ms-cell"><div class="g-marker">🏗 Archi v0</div></div>
+      <div class="g-ms-cell"></div>
+      <div class="g-ms-cell"><div class="g-marker">⚙ LLMOps</div></div>
+      <div class="g-ms-cell"></div>
+      <div class="g-ms-cell"><div class="g-marker">🎯 UC-01+03</div></div>
+      <div class="g-ms-cell"></div>
+      <div class="g-ms-cell"><div class="g-marker">🔒 Audit BAM</div></div>
+      <div class="g-ms-cell"></div>
+      <div class="g-ms-cell"><div class="g-marker">📈 Scale UC-05+</div></div>
+      <div class="g-ms-cell"><div class="g-marker">✅ Bilan M+6</div></div>
+    </div>
+    <div class="gantt-legend">
+      <div class="gl"><div class="gl-dot navy"></div>Architecture IA</div>
+      <div class="gl"><div class="gl-dot violet"></div>LLMOps</div>
+      <div class="gl"><div class="gl-dot green"></div>IA Engineering</div>
+      <div class="gl"><div class="gl-dot renew"></div>Renouvellement M+3</div>
+      <div class="gl"><div class="gl-dot wait"></div>Préavis / Onboarding</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 7 — CTA ══ -->
+<div class="slide" id="s7">
+  <div class="cta-inner">
+    <div class="cta-check">🤝</div>
+    <div class="slide-eyebrow" style="margin-bottom:12px">Prochaines étapes</div>
+    <div class="cta-title">Prêts à démarrer<br>dès <span style="color:var(--gold)">Mai 2026</span></div>
+    <div class="cta-sub">6 consultants experts mobilisés · 3 pôles complémentaires<br>Démarrage immédiat pour Oussama Bennis & ElMahdi Aymani</div>
+    <div class="cta-cards">
+      <div class="cta-card">
+        <div class="cta-card-icon">📋</div>
+        <div class="cta-card-label">Prochaine étape</div>
+        <div class="cta-card-value">Réunion de cadrage</div>
+      </div>
+      <div class="cta-card">
+        <div class="cta-card-icon">🚀</div>
+        <div class="cta-card-label">Sprint 1</div>
+        <div class="cta-card-value">Mai 2026</div>
+      </div>
+      <div class="cta-card">
+        <div class="cta-card-icon">🔄</div>
+        <div class="cta-card-label">Renouvellement</div>
+        <div class="cta-card-value">Tranche M+3</div>
+      </div>
+    </div>
+    <div class="cta-contact">Mehdi Aboussalah · Business Manager<br><span style="font-weight:400;font-size:12px">mehdi.aboussalah@gmail.com</span></div>
+    <div class="cta-note">Document confidentiel · Réponse AO Saham Bank · Avril 2026 · Siya Consulting</div>
+  </div>
+</div>
+
+</div><!-- /slides -->
+
+<script>
+const TOTAL = 8;
+let current = 0;
+let animating = false;
+let countersRun = {};
+let ganttRun = false;
+
+// ── INIT ──
+const dotsEl = document.getElementById('dots');
+const progressEl = document.getElementById('progress-bar');
+const counterEl = document.getElementById('counter');
+
+for(let i=0;i<TOTAL;i++){
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = ()=>goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function updateUI(){
+  // progress
+  progressEl.style.width = ((current/(TOTAL-1))*100)+'%';
+  // dots
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current));
+  // counter
+  counterEl.textContent = (current+1).toString().padStart(2,'0') + ' / ' + TOTAL.toString().padStart(2,'0');
+}
+
+function goTo(n){
+  if(animating||n===current||n<0||n>=TOTAL) return;
+  animating = true;
+  const prev = document.getElementById('s'+current);
+  const next = document.getElementById('s'+n);
+  prev.classList.add(n>current?'out-left':'');
+  prev.classList.remove('active');
+  current = n;
+  next.classList.remove('out-left');
+  next.classList.add('active');
+  updateUI();
+  onSlideEnter(current);
+  setTimeout(()=>{
+    prev.classList.remove('out-left');
+    animating=false;
+  },520);
+}
+
+function onSlideEnter(n){
+  if(n===1) runCounters();
+  if(n===6) runGantt();
+}
+
+// ── COUNTERS ──
+function runCounters(){
+  if(countersRun[1]) return;
+  countersRun[1]=true;
+  document.querySelectorAll('#s1 .count').forEach(el=>{
+    const target = +el.dataset.target;
+    let cur = 0;
+    const step = Math.ceil(target/30);
+    const t = setInterval(()=>{
+      cur = Math.min(cur+step, target);
+      el.textContent = cur;
+      if(cur>=target) clearInterval(t);
+    },40);
+  });
+}
+
+// ── GANTT BARS ──
+function runGantt(){
+  if(ganttRun) return;
+  ganttRun=true;
+  const bars = document.querySelectorAll('#s6 .gbar.animated');
+  bars.forEach((b,i)=>{
+    setTimeout(()=>{ b.classList.add('full'); }, i*18);
+  });
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') goTo(current+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') goTo(current-1);
+});
+
+document.getElementById('prev').onclick = ()=>goTo(current-1);
+document.getElementById('next').onclick = ()=>goTo(current+1);
+
+// ── TABS ──
+function switchTab(name, el, color){
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active','navy','violet','green')});
+  el.classList.add('active',color);
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+updateUI();
+</script>
+</body>
+</html>
